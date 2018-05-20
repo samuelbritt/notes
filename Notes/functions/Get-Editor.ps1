@@ -19,7 +19,7 @@ function Get-Editor
                 &$this.Editor -g "${Path}:${lines}"
             }
         }
-        "default" {
+        default {
             $editor | Add-Member -Name 'OpenToEnd' -MemberType ScriptMethod -Value {
                 param($Path)
                 &$this.Editor $Path
