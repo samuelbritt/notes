@@ -45,7 +45,7 @@ function Get-Note
             {
                 "tags"
                 {
-                    $value = @($value -split ',' | ForEach-Object { $_.Trim() })
+                    $value = @($value.Split(', ', [System.StringSplitOptions]::RemoveEmptyEntries))
                     if ($value -ne '-')
                     {
                         $note.Tags += $value

@@ -23,7 +23,7 @@ function New-Note
     $content = $content.Replace('${TITLE}', $title)
     $content = $content.Replace('${AUTHOR}', $env:USERNAME)
     $content = $content.Replace('${DATE}', $nowForFileMetadata)
-    $content = $content.Replace('${TAGS}', ($Tag -join ','))
+    $content = $content.Replace('${TAGS}', ($Tag -join ', '))
 
     New-Item $path -ItemType File -Value $content | Open-Note -ScrollToEnd
 }
