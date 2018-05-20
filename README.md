@@ -26,17 +26,17 @@ Find all notes with a given tag.
 ```powershell
 > fn -Tag food
 
-Name    : 2018-05-19_202426-My-favorite-breakfast.md
 Title   : My favorite breakfast
+Tags    : {food, spam, eggs}
+Name    : 2018-05-19_202426-My-favorite-breakfast.md
 Path    : C:\Users\sbritt\notes-test\2018-05-19_202426-My-favorite-breakfast.md
 Created : 5/19/2018 8:24:26 PM
 Updated : 5/19/2018 8:24:26 PM
-Tags    : {food, spam, eggs}
 
-Name    : 2018-05-19_202454-My-favorite-lunch.md
 Title   : My favorite lunch
+Tags    : {food, salad}
+Name    : 2018-05-19_202454-My-favorite-lunch.md
 Path    : C:\Users\sbritt\notes-test\2018-05-19_202454-My-favorite-lunch.md
 Created : 5/19/2018 8:24:54 PM
 Updated : 5/19/2018 8:24:54 PM
-Tags    : {food, salad}
 ```

@@ -21,12 +21,12 @@ function Get-Note
         $name = $item.FullName.Replace($script:NotesPath, '').Trim($pathSep)
         $name = [Regex]::Replace($name, '\.md$', '')
         $note = New-Object psobject -Property ([ordered] @{
-                Name = $name
                 Title = $name
+                Tags = @()
+                Name = $name
                 Path = $item.FullName
                 Created = $item.CreationTime
                 Updated = $item.LastWriteTime
-                Tags = @()
             })
 
         $item |
