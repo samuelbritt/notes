@@ -18,7 +18,8 @@ function Get-Note
 
         $pathSep = [System.IO.Path]::DirectorySeparatorChar
         $item = Get-Item $Path
-        $name = $item.FullName.Replace($script:NotesPath, '').Replace('\.md$', '').Trim($pathSep)
+        $name = $item.FullName.Replace($script:NotesPath, '').Trim($pathSep)
+        $name = [Regex]::Replace($name, '\.md$', '')
         $note = New-Object psobject -Property ([ordered] @{
                 Name = $name
                 Title = $name
