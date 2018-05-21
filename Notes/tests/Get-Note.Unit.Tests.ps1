@@ -2,7 +2,6 @@ $modulePath = Split-Path $PSScriptRoot
 $moduleName = Split-Path $modulePath -Leaf
 Import-Module "$(Join-Path $modulePath $moduleName).psd1" -Force
 
-
 $global:SampleNotes = @{
     NoMetadata = @"
 # Header text
