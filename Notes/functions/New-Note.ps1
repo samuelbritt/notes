@@ -4,28 +4,48 @@ function New-Note
         [string] $Title = "Untitled",
         [string[]] $Tag = '-'
     )
-    Set-StrictMode -Version Latest
-
-    $notesPath = $script:NotesPath
-    $now = Get-Date
-    $nowForFileName = $now.ToString('yyyy-MM-dd_HHmmss')
-    $nowForFileMetadata = $now.ToString('yyyy-MM-ddTHH:mm:ss')
-
-    $fileName = "$nowForFileName-${Title}.md"
-    $fileName = $fileName.Replace(' ', '-')
-    $path = Join-Path $notesPath $fileName
-    if (Test-Path $path)
+    begin
     {
-        throw ($script:Errors.PATH_EXISTS -f $path)
+        function Get-Path
+        {
+            param(
+                [string] $Title,
+                [datetime] $Date
+            )
+            Set-StrictMode -Version Latest
+            $notesPath = $script:NotesPath
+
+            $invalidCharacters = [System.IO.Path]::GetInvalidFileNameChars()
+            $titleForPath = $Title.Replace(' ', '-')
+            $titleForPath = $titleForPath.Split($invalidCharacters, [System.StringSplitOptions]::RemoveEmptyEntries) -join '_'
+
+            $now = $Date.ToString('yyyy-MM-dd_HHmmss')
+            $fileName = "${now}-${titleForPath}.md"
+
+            Join-Path $notesPath $fileName
+        }
     }
+    process
+    {
+        Set-StrictMode -Version Latest
 
-    $content = Get-Content $script:NoteTemplate -Raw
-    $content = $content.Replace('${TITLE}', $title)
-    $content = $content.Replace('${AUTHOR}', $env:USERNAME)
-    $content = $content.Replace('${DATE}', $nowForFileMetadata)
-    $content = $content.Replace('${TAGS}', ($Tag -join ', '))
+        $date = Get-Date
+        $path = Get-Path -Title $title -Date $date
+        if (Test-Path $path)
+        {
+            throw ($script:Errors.PATH_EXISTS -f $path)
+        }
 
-    New-Item $path -ItemType File -Value $content | Open-Note -ScrollToEnd
+        $content = Get-Content $script:NoteTemplate -Raw
+        $content = $content.Replace('${TITLE}', $title)
+        $content = $content.Replace('${AUTHOR}', $env:USERNAME)
+        $content = $content.Replace('${DATE}', $date.ToString('yyyy-MM-ddTHH:mm:ss'))
+        $content = $content.Replace('${TAGS}', ($Tag -join ', '))
+
+        $note = New-Item $path -ItemType File -Value $content | Get-Note
+        $note | Open-Note -ScrollToEnd
+        $note
+    }
 }
 
 Set-Alias nn New-Note
