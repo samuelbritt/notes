@@ -29,7 +29,7 @@ InModuleScope $moduleName {
 
             It 'Creates an untitled note' {
                 $note.Title | Should BeLikeExactly '*Untitled*'
-                $note.Path | Should BeLikeExactly '*Untitled*'
+                $note.Path | Should BeLikeExactly '*untitled*'
             }
 
             It 'Does not add tags' {
@@ -55,12 +55,16 @@ InModuleScope $moduleName {
                 (Get-Item $note.Path).Extension | Should Be '.md'
             }
 
-            It 'Adds the requested title' {
-                $note.Title | Should BeExactly 'My new note'
+            It 'Adds the requested title in title case' {
+                $note.Title | Should BeExactly 'My New Note'
+            }
+
+            It 'Subsitutes convers the title to lowercase in the path' {
+                $note.Path | Should BeLikeExactly '*my*new*note*'
             }
 
             It 'Subsitutes special characters in path' {
-                $note.Path | Should BeLikeExactly '*My-new-note*'
+                $note.Path | Should BeLikeExactly '*my-new-note*'
             }
 
             It 'Does not add tags' {
@@ -86,12 +90,16 @@ InModuleScope $moduleName {
                 (Get-Item $note.Path).Extension | Should Be '.md'
             }
 
-            It 'Adds the requested title' {
-                $note.Title | Should BeExactly 'My new note'
+            It 'Adds the requested title in title case' {
+                $note.Title | Should BeExactly 'My New Note'
+            }
+
+            It 'Subsitutes convers the title to lowercase in the path' {
+                $note.Path | Should BeLikeExactly '*my*new*note*'
             }
 
             It 'Subsitutes special characters in path' {
-                $note.Path | Should BeLikeExactly '*My-new-note*'
+                $note.Path | Should BeLikeExactly '*my-new-note*'
             }
 
             It 'Does not add tags' {
@@ -104,6 +112,7 @@ InModuleScope $moduleName {
 
             $note = $null
             $title      = 'Hello: This/is\a|*terrible* <"title">?'
+            # $title      = 'Hello: This/is\a|*terrible* <"title">?'
             $cleanTitle = 'Hello_-This_is_a_terrible_-_title'
 
             $hash = @{}
@@ -130,7 +139,7 @@ InModuleScope $moduleName {
             }
 
             It 'Subsitutes special characters in path' {
-                $note.Path | Should BeLikeExactly "*${cleanTitle}*"
+                $note.Path | Should BeLikeExactly "*$($cleanTitle.ToLower())*"
             }
 
             It 'Does not add tags' {
