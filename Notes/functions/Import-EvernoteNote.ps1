@@ -111,7 +111,6 @@ function Import-EvernoteNote
                 $content = Get-Content $Path
                 $content | ForEach-Object {
                     $line = $_
-
                     if ($line -match '^\|\s*\*\*(Created|Updated|Source|Tags):\*\*\s*\|\s*\*(.*)\*\s*\|$')
                     {
                         $metadataKey = $Matches[1]
@@ -123,7 +122,6 @@ function Import-EvernoteNote
                             'Source' { $metadata['source'] = $metadataValue }
                             'Tags' { $metadata['tags'] = ($metadataValue -split ', ') }
                         }
-
                     }
                 }
                 $content = $content -join [System.Environment]::NewLine
@@ -132,8 +130,8 @@ function Import-EvernoteNote
                 $singleLineOption = [System.Text.RegularExpressions.RegexOptions]::Singleline
                 $multiLineOption = [System.Text.RegularExpressions.RegexOptions]::Multiline
 
-                # Clear out non-ascii characters
-                $pattern = '[^\x00-\x7F]'
+                # Clear out null characters
+                $pattern = '\0'
                 $regex = New-Object regex $pattern, $multiLineOption
                 $content = $regex.Replace($content, [string]::Empty)
 
@@ -161,7 +159,7 @@ function Import-EvernoteNote
                 $regex = New-Object regex $pattern, $singleLineOption
                 $content = $regex.Replace($content, [System.Environment]::NewLine * 2)
 
-                $content | Set-Content $DestinationPath -Force
+                $content | Out-File $DestinationPath -Force -Encoding utf8
                 New-Object psobject -Property @{
                     Path = $DestinationPath
                     Metadata = $metadata
