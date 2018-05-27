@@ -1,9 +1,9 @@
 ---
-Title:    ${TITLE}
-Author:   ${AUTHOR}
-Date:     ${DATE}
-Tags:     ${TAGS}
-Keywords: ${KEYWORDS}
+title:    ${TITLE}
+author:   ${AUTHOR}
+date:     ${DATE}
+tags:     ${TAGS}
+keywords: ${KEYWORDS}
 ---
 
 # ${TITLE}
