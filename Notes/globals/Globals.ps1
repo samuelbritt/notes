@@ -1,7 +1,8 @@
 $script:Editor = if ($env:NOTES_EDITOR) { $env:NOTES_EDITOR } else { 'code' }
-$script:NotesPath = if ($env:NOTES_PATH) { $env:NOTES_PATH } else { "${env:HOME}\notes" }
-$script:NoteTemplate = if ($env:NOTES_TEMPLATE_PATH) { $env:NOTES_TEMPLATE_PATH } else { "$PSScriptRoot/../assets/NoteTemplate.md" }
-
+$script:NotesPath = Convert-Path (Get-ValueOrDefault $env:NOTES_PATH -Default "${env:HOME}\notes")
+$script:NoteTemplate = Convert-Path (Get-ValueOrDefault $env:NOTES_PATH -Default "$PSScriptRoot/../assets/NoteTemplate.md")
+$script:PandocExe = Convert-Path "$PSScriptRoot\..\assets\pandoc\pandoc-2.2.1\pandoc.exe"
+$script:PandocTemplate = Convert-Path "$PSScriptRoot\..\assets\pandoc\markdown-template.txt"
 $script:ShortArticlesAndPrepositions = @(
     'a'
     'an'
