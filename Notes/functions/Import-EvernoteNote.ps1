@@ -84,8 +84,8 @@ function Import-EvernoteNote
                 Pop-Location
 
                 $DestinationPath
-                }
             }
+        }
 
         function Read-Metadata
         {
@@ -103,9 +103,9 @@ function Import-EvernoteNote
                         [Parameter(ValueFromPipeline)]
                         [string] $Keywords
                     )
-            process
-            {
-                Set-StrictMode -Version Latest
+                    process
+                    {
+                        Set-StrictMode -Version Latest
                         $Keywords -split ',\s*|\s+' | Where-Object { $_ }
                     }
                 }
@@ -116,7 +116,7 @@ function Import-EvernoteNote
 
                 $metadata = @{}
                 Get-Content $Path | ForEach-Object {
-                    if ($_ -match '^\|\s*\*\*(Created|Updated|Source|Tags):\*\*\s*\|\s*\*(.*)\*\s*\|$')
+                    if ($_ -match '^\|\s*\*\*(Created|Updated|Source|Tags):\*\*\s*\|\s*\*?(.*?)\*?\s*\|$')
                     {
                         $metadataKey = $Matches[1]
                         $metadataValue = $Matches[2]
@@ -125,13 +125,13 @@ function Import-EvernoteNote
                             'Created' { $metadata['created'] = (Get-Date $metadataValue) }
                             'Updated' { $metadata['updated'] = (Get-Date $metadataValue) }
                             'Source' { $metadata['source'] = $metadataValue }
-                            'Tags' { $metadata['tags'] = $metadataValue | Split-Keywords }
+                            'Tags' { $metadata['tags'] = @($metadataValue | Split-Keywords) }
                         }
                     }
                     elseif ($_ -match '^(kw|keywords):?(.*)$')
                     {
                         $metadataValue = $Matches[2]
-                        $metadata['keywords'] = $metadataValue | Split-Keywords
+                        $metadata['keywords'] = @($metadataValue | Split-Keywords)
                     }
                 }
                 $metadata
@@ -228,12 +228,10 @@ function Import-EvernoteNote
                     {
                         $value = $value.ToString('yyyy-MM-dd HH:mm:ss')
                     }
-                    elseif ($value -is [array])
-                    {
-                        $value = $value -join ', '
-                    }
 
-                    $pandocParams += "--metadata=""${key}:${value}"""
+                    $value | ForEach-Object {
+                        $pandocParams += "--metadata=""${key}:${_}"""
+                    }
                 }
 
                 $pandocParams += """$Path"""
@@ -290,6 +288,5 @@ function Import-EvernoteNote
             Metadata = $metadata
         }
         $finalPath = Write-FinalMarkdown @params
-
     }
 }
