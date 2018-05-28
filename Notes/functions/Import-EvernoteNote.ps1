@@ -124,7 +124,13 @@ function Import-EvernoteNote
                         {
                             'Created' { $metadata['created'] = (Get-Date $metadataValue) }
                             'Updated' { $metadata['updated'] = (Get-Date $metadataValue) }
-                            'Source' { $metadata['source'] = $metadataValue }
+                            'Source' {
+                                if ($metadataValue -match '^\[.*\]\((.*)\)$')
+                                {
+                                    $metadataValue = $Matches[1]
+                                }
+                                $metadata['source'] = $metadataValue
+                            }
                             'Tags' { $metadata['tags'] = @($metadataValue | Split-Keywords) }
                         }
                     }
@@ -288,5 +294,6 @@ function Import-EvernoteNote
             Metadata = $metadata
         }
         $finalPath = Write-FinalMarkdown @params
+        Get-Item $finalPath
     }
 }
