@@ -68,7 +68,7 @@ function Import-EvernoteNote
                 $importDate = Get-Date
                 $pandocParams = @(
                     "--from=""html-native_divs-native_spans-empty_paragraphs"""
-                    "--to=""markdown_mmd+yaml_metadata_block"""
+                    "--to=""markdown_mmd+yaml_metadata_block+smart"""
                     "--output=""$DestinationPath"""
                     "--extract-media=""$ExtractMediaRelativePath"""
                     "--standalone"
