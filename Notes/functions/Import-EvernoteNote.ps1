@@ -29,7 +29,7 @@ function Import-EvernoteNote
                 $evernoteFilesPath = Join-Path $evernoteItem.Directory.FullName "${evernoteBaseName}_files"
                 $hasAssets = (Test-Path $evernoteFilesPath -PathType Container)
 
-                $tempDir = Join-Path $env:TEMP "evernote-import\$ImportId"
+                $tempDir = Join-Paths $env:TEMP, "evernote-import", $ImportId.ToString()
                 New-Item $tempDir -ItemType Directory -Force | Out-Null
 
                 $sourceItem = Copy-Item $evernotePath $tempDir -PassThru
@@ -83,12 +83,9 @@ function Import-EvernoteNote
                 &$script:PandocExe $pandocParams
                 Pop-Location
 
-                New-Object psobject -Property @{
-                    Path = $DestinationPath
-                    ImportDate = $importDate
+                $DestinationPath
                 }
             }
-        }
 
         function Read-Metadata
         {
@@ -97,10 +94,26 @@ function Import-EvernoteNote
                 [Parameter(Mandatory)]
                 [string] $Path
             )
+            begin
+            {
+                function Split-Keywords
+                {
+                    [CmdletBinding()]
+                    param(
+                        [Parameter(ValueFromPipeline)]
+                        [string] $Keywords
+                    )
             process
             {
-                $metadata = @{}
                 Set-StrictMode -Version Latest
+                        $Keywords -split ',\s*|\s+' | Where-Object { $_ }
+                    }
+                }
+            }
+            process
+            {
+                Set-StrictMode -Version Latest
+
                 $metadata = @{}
                 Get-Content $Path | ForEach-Object {
                     if ($_ -match '^\|\s*\*\*(Created|Updated|Source|Tags):\*\*\s*\|\s*\*(.*)\*\s*\|$')
@@ -112,12 +125,13 @@ function Import-EvernoteNote
                             'Created' { $metadata['created'] = (Get-Date $metadataValue) }
                             'Updated' { $metadata['updated'] = (Get-Date $metadataValue) }
                             'Source' { $metadata['source'] = $metadataValue }
-                            'Tags' { $metadata['tags'] = ($metadataValue -split ', ') }
+                            'Tags' { $metadata['tags'] = $metadataValue | Split-Keywords }
                         }
                     }
-                    elseif ($_ -match '^kw:?(.*)$')
+                    elseif ($_ -match '^(kw|keywords):?(.*)$')
                     {
-                        $metadata['keywords'] = (($Matches[1] -split ',') -split ' ') | ForEach-Object { $_.Trim() }
+                        $metadataValue = $Matches[2]
+                        $metadata['keywords'] = $metadataValue | Split-Keywords
                     }
                 }
                 $metadata
@@ -216,10 +230,7 @@ function Import-EvernoteNote
                     }
                     elseif ($value -is [array])
                     {
-                        $value = ($value |
-                            ForEach-Object { $_.Trim() } |
-                            Where-Object { ![string]::IsNullOrEmpty($_) }
-                        ) -join ', '
+                        $value = $value -join ', '
                     }
 
                     $pandocParams += "--metadata=""${key}:${value}"""
@@ -254,26 +265,25 @@ function Import-EvernoteNote
             ExtractMediaRelativePath = $ExtractMediaRelativePath
             WorkingDirectory = $preparedFiles.WorkingDirectory
         }
-        $converted = ConvertFrom-EvernoteHtml @params
-        if (!(Test-Path $converted.Path))
+        $convertedPath = ConvertFrom-EvernoteHtml @params
+        if (!(Test-Path $convertedPath))
         {
             throw ($script.Errors.FAILED_IMPORT -f $Path)
         }
 
-        $metadata = Read-Metadata -Path $converted.Path
-
         Write-Verbose "02: Cleaning up export and extracting metadata"
+        $metadata = Read-Metadata -Path $convertedPath
         $params = @{
-            Path = $converted.Path
+            Path = $convertedPath
             DestinationPath = (Join-Path $preparedFiles.WorkingDirectory "${importId}_02.md")
         }
         $cleanedPath = Resolve-ExportedMarkdown @params
-        if (!(Test-Path $converted.Path))
+        if (!(Test-Path $convertedPath))
         {
             throw ($script.Errors.FAILED_IMPORT -f $Path)
         }
 
-        Write-Verbose "02: Write final markdown"
+        Write-Verbose "02: Writing final markdown"
         $params = @{
             Path = $cleanedPath
             DestinationPath = (Join-Path $preparedFiles.WorkingDirectory "${importId}_03.md")
