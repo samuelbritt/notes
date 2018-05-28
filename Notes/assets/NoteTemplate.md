@@ -1,7 +1,7 @@
 ---
 title:    ${TITLE}
 author:   ${AUTHOR}
-date:     ${DATE}
+created:  ${CREATED}
 tags:     ${TAGS}
 keywords: ${KEYWORDS}
 ---

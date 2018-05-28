@@ -74,7 +74,7 @@ function Import-EvernoteNote
                     "--standalone"
                     "--atx-headers"
                     "--tab-stop=2"
-                    "--metadata=""importedOn:$($importDate.ToString('yyyy-MM-ddTHH:mm:ss'))"""
+                    "--metadata=""imported:$($importDate.ToString('yyyy-MM-dd HH:mm:ss'))"""
                     "--metadata=""importedFrom:Evernote"""
                     """$Path"""
                 )
@@ -109,7 +109,7 @@ function Import-EvernoteNote
                         $metadataValue = $Matches[2]
                         switch ($metadataKey)
                         {
-                            'Created' { $metadata['date'] = (Get-Date $metadataValue) }
+                            'Created' { $metadata['created'] = (Get-Date $metadataValue) }
                             'Updated' { $metadata['updated'] = (Get-Date $metadataValue) }
                             'Source' { $metadata['source'] = $metadataValue }
                             'Tags' { $metadata['tags'] = ($metadataValue -split ', ') }
@@ -212,7 +212,14 @@ function Import-EvernoteNote
                     $value = $Metadata[$key]
                     if ($value -is [datetime])
                     {
-                        $value = $value.ToString('yyyy-MM-ddTHH:mm:ss')
+                        $value = $value.ToString('yyyy-MM-dd HH:mm:ss')
+                    }
+                    elseif ($value -is [array])
+                    {
+                        $value = ($value |
+                            ForEach-Object { $_.Trim() } |
+                            Where-Object { ![string]::IsNullOrEmpty($_) }
+                        ) -join ', '
                     }
 
                     $pandocParams += "--metadata=""${key}:${value}"""

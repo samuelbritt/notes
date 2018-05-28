@@ -46,7 +46,8 @@ function New-Note
         $content = Get-Content $script:NoteTemplate -Raw
         $content = $content.Replace('${TITLE}', $Title)
         $content = $content.Replace('${AUTHOR}', $env:USERNAME)
-        $content = $content.Replace('${DATE}', $date.ToString('yyyy-MM-ddTHH:mm:ss'))
+        $content = $content.Replace('${CREATED}', $date.ToString('yyyy-MM-dd HH:mm:ss'))
+
         $content = $content.Replace('${TAGS}', ($Tag -join ', '))
         $content = $content.Replace('${KEYWORDS}', ($Keyword -join ', '))
 
