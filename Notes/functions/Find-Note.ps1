@@ -1,10 +1,18 @@
 function Find-Note
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
+        [Parameter(Mandatory, ParameterSetName = 'ByPattern')]
         [string] $Pattern,
+
+        [Parameter()]
         [string[]] $Tag,
+
+        [Parameter()]
         [string[]] $Keyword,
+
+        [Parameter(ParameterSetName = 'ByPattern')]
+        [switch] $Exact
     )
     begin
     {
@@ -27,6 +35,11 @@ function Find-Note
         Set-StrictMode -Version Latest
 
         $path = $script:NotesPath
+
+        if ($Pattern -and !$Exact)
+        {
+            $Pattern = [regex]::Replace($Pattern, '\s+', '.*')
+        }
 
         Get-ChildItem $path -Recurse -Include *.md |
             ForEach-Object {
