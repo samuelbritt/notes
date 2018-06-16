@@ -2,7 +2,8 @@ function New-Note
 {
     param(
         [string] $Title = "Untitled",
-        [string[]] $Tag = '-'
+        [string[]] $Tag = '-',
+        [string[]] $Keyword = '-'
     )
     begin
     {
@@ -47,6 +48,7 @@ function New-Note
         $content = $content.Replace('${AUTHOR}', $env:USERNAME)
         $content = $content.Replace('${DATE}', $date.ToString('yyyy-MM-ddTHH:mm:ss'))
         $content = $content.Replace('${TAGS}', ($Tag -join ', '))
+        $content = $content.Replace('${KEYWORDS}', ($Keyword -join ', '))
 
         $note = New-Item $path -ItemType File -Value $content | Get-Note
         $note | Open-Note -ScrollToEnd

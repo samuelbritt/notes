@@ -8,7 +8,7 @@ function Get-Note
     process
     {
         Set-StrictMode -Version Latest
-        $metadataKeys = @("Title", "Author", "Date", "Tags") -join '|'
+        $metadataKeys = @("Title", "Author", "Date", "Tags", "Keywords") -join '|'
         $pattern = "^(?<key>${metadataKeys}):\s*(?<value>.*)$"
 
         if (!(Test-Path $Path))
@@ -23,6 +23,7 @@ function Get-Note
         $note = New-Object psobject -Property ([ordered] @{
                 Title = $name
                 Tags = @()
+                Keywords = @()
                 Name = $name
                 Path = $item.FullName
                 Created = $item.CreationTime
@@ -49,6 +50,14 @@ function Get-Note
                     if ($value -ne '-')
                     {
                         $note.Tags += $value
+                    }
+                }
+                "keywords"
+                {
+                    $value = @($value.Split(', ', [System.StringSplitOptions]::RemoveEmptyEntries))
+                    if ($value -ne '-')
+                    {
+                        $note.Keywords += $value
                     }
                 }
                 "date"

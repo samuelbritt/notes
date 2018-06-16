@@ -3,7 +3,7 @@ Title:    ${TITLE}
 Author:   ${AUTHOR}
 Date:     ${DATE}
 Tags:     ${TAGS}
-Keywords: -
+Keywords: ${KEYWORDS}
 ---
 
 # ${TITLE}

@@ -3,7 +3,8 @@ function Find-Note
     [CmdletBinding()]
     param(
         [string] $Pattern,
-        [string[]] $Tag
+        [string[]] $Tag,
+        [string[]] $Keyword,
     )
     begin
     {
@@ -40,6 +41,11 @@ function Find-Note
             }
 
             if ($match -and $Tag -and ($Tag | Where-Object { $note.Tags -notcontains $_ }))
+            {
+                $match = $false
+            }
+
+            if ($match -and $Keyword -and ($Keyword | Where-Object { $note.Keywords -notcontains $_ }))
             {
                 $match = $false
             }
