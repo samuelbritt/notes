@@ -14,10 +14,15 @@ function New-Note
             )
             Set-StrictMode -Version Latest
             $notesPath = $script:NotesPath
+            $titleForPath = $Title
 
             $invalidCharacters = [System.IO.Path]::GetInvalidFileNameChars()
-            $titleForPath = $Title.ToLower().Replace(' ', '-')
             $titleForPath = $titleForPath.Split($invalidCharacters, [System.StringSplitOptions]::RemoveEmptyEntries) -join '_'
+            $titleForPath = $titleForPath.ToLower().Replace(' ', '-')
+            while ($titleForPath -match '--')
+            {
+                $titleForPath = $titleForPath.Replace('--', '-')
+            }
 
             $now = $Date.ToString('yyyy-MM-dd_HHmmss')
             $fileName = "${now}-${titleForPath}.md"

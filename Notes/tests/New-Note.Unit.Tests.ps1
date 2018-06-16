@@ -107,12 +107,11 @@ InModuleScope $moduleName {
             }
         }
 
-        Context 'When creating a note special characters in the title' {
+        Context 'When creating a note with special characters in the title' {
             Set-StrictMode -Version Latest
 
             $note = $null
             $title      = 'Hello: This/is\a|*terrible* <"title">?'
-            # $title      = 'Hello: This/is\a|*terrible* <"title">?'
             $cleanTitle = 'Hello_-This_is_a_terrible_-_title'
 
             $hash = @{}
@@ -147,5 +146,43 @@ InModuleScope $moduleName {
             }
         }
 
+        Context 'When creating a note with dashes in the title' {
+            Set-StrictMode -Version Latest
+
+            $note = $null
+            $title      = 'Hello - This Has -- Several Dashes'
+            $cleanTitle = 'Hello-This-Has-Several-Dashes'
+
+            $hash = @{}
+            It 'Does not throw' {
+                { $hash.note = New-Note -Title $title } | Should Not Throw
+            }
+            $note = $hash.note
+
+            It 'Creates a new file' {
+                Test-Path $note.Path | Should BeTrue
+            }
+
+            It 'Creates a file in the notes directory' {
+                $pathSep = [System.IO.Path]::DirectorySeparatorChar
+                (Get-Item $note.Path).DirectoryName.Trim($pathSep) | Should BeExactly $script:NotesPath.Trim($pathSep)
+            }
+
+            It 'Creates a new markdown file' {
+                (Get-Item $note.Path).Extension | Should Be '.md'
+            }
+
+            It 'Adds the requested title' {
+                $note.Title | Should BeExactly $title
+            }
+
+            It 'Subsitutes special characters in path' {
+                $note.Path | Should BeLikeExactly "*$($cleanTitle.ToLower())*"
+            }
+
+            It 'Does not add tags' {
+                $note.Tags | Should BeNullOrEmpty
+            }
+        }
     }
 }
